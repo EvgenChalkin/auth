@@ -1,0 +1,33 @@
+.QWidget{
+    background-color: #659DBD;
+}
+.QLabel{
+    font-size: 20px;
+    font-family: "Comic Sans MS";
+    color: white;
+}
+.QPushButton:hover{
+    background-color: rgb(230, 229, 229);
+    font-size: 20px;
+    font-family: "Comic Sans MS";
+    border-radius: 7px;
+    color: #659DBD;
+}
+.QPushButton{
+    background-color: white;
+    font-size: 18px;
+    font-family: "Comic Sans MS";
+    border-radius: 7px;
+    color: #659DBD;
+}
+.QLineEdit{
+    border-radius: 7px;
+    font-size: 20px;
+    font-family: "Comic Sans MS";
+    color: #659DBD;
+}
+.QRadioButton{
+    font-size: 20px;
+    font-family: "Comic Sans MS";
+    color: white;
+}
