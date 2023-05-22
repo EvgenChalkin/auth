@@ -1,6 +1,6 @@
-import sys, random
+import sys, random, string
 from PyQt6.QtCore import QTimer
-from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QRadioButton
+from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QRadioButton, QHBoxLayout
 
 
 class MainWindow(QMainWindow):
@@ -82,57 +82,67 @@ class SecondWindow(QMainWindow):
 
 
 class CapchaWindow(QMainWindow):
+    close_ = False
+
+    def closeEvent(self, e):
+        if not self.close_:
+            e.ignore()
+
     def __init__(self):
         super().__init__()
 
         self.resize(300, 200)
         self.setWindowTitle("Capcha window")
 
-        self.lbl_capcha = QLabel("Enter capcha: ")
-        self.lbl_rnd = QLabel(str(random.randint(1000, 9999)))
-        self.edit_capcha = QLineEdit()
-        self.btnCapcha = QPushButton("enter")
+        self.lbl_error = QLabel("Enter capcha: ")
+        cap_str = string.digits + string.ascii_lowercase
+        cap_list = random.sample(cap_str, 4)
+        self.cap_text = ''.join(cap_list)
+        self.lbl_cap = QLabel(self.cap_text)
+        self.edit_cap = QLineEdit()
+        self.btn_cap = QPushButton("enter")
         self.lockout = 0
         self.timeout = 3
 
         layout = QVBoxLayout()
-        layout.addWidget(self.lbl_capcha)
-        layout.addWidget(self.lbl_rnd)
-        layout.addWidget(self.edit_capcha)
-        layout.addWidget(self.btnCapcha)
+        layout.addWidget(self.lbl_error)
+        layout.addWidget(self.lbl_cap)
+        layout.addWidget(self.edit_cap)
+        layout.addWidget(self.btn_cap)
 
         widget = QWidget()
         widget.setLayout(layout)
         self.setCentralWidget(widget)
 
-        self.btnCapcha.clicked.connect(lambda: self.capcha(self.edit_capcha.text(), self.lbl_rnd.text()))
+        self.btn_cap.clicked.connect(lambda: self.capcha(self.edit_cap.text(), self.lbl_cap.text()))
 
         with open("style.css", "r") as css:
             widget.setStyleSheet(css.read())
 
-    def capcha(self, edit_capcha, lbl_rnd):
-        if edit_capcha == lbl_rnd:
+    def capcha(self, edit_cap, lbl_rnd):
+        if edit_cap == lbl_rnd:
             self.window1 = MainWindow()
+            self.close_ = True
             self.window1.show()
             self.close()
         elif self.lockout == 2:
             self.timer = QTimer()
             self.timer.start(1000)
-            self.btnCapcha.setDisabled(True)
-            self.lbl_capcha.setText("blocked for 3 seconds!")
+            self.btn_cap.setDisabled(True)
+            self.lbl_error.setText("blocked for 3 seconds!")
             self.timer.timeout.connect(self.timer_tick)
         else:
             self.lockout += 1
 
     def timer_tick(self):
         self.timeout -= 1
-        self.lbl_capcha.setText(f"blocked for {self.timeout} seconds!")
+        self.lbl_error.setText(f"blocked for {self.timeout} seconds!")
         if self.timeout == 0:
             self.lockout = 0
             self.timeout = 3
             self.timer.stop()
-            self.btnCapcha.setDisabled(False)
-            self.lbl_capcha.setText("enter capcha: ")
+            self.btn_cap.setDisabled(False)
+            self.lbl_error.setText("enter capcha: ")
 
 
 class TestWindow(QMainWindow):
@@ -216,20 +226,29 @@ class TestWindow3(QMainWindow):
 
         self.lbl_sweet = QLabel("ТЫ КРАСАВА!")
         self.btn_close = QPushButton("close")
+        self.btn_res = QPushButton("view result")
 
         self.btn_close.clicked.connect(self.close)
+        self.btn_res.clicked.connect(self.write_res)
 
         layout = QVBoxLayout()
+        hbox = QHBoxLayout()
         layout.addWidget(self.lbl_sweet)
-        layout.addWidget(self.btn_close)
+        hbox.addWidget(self.btn_close)
+        hbox.addWidget(self.btn_res)
 
         widget = QWidget()
+        layout.addLayout(hbox)
         widget.setLayout(layout)
         self.setCentralWidget(widget)
 
         with open("style.css", "r") as css:
             widget.setStyleSheet(css.read())
 
+    def write_res(self):
+        res = "ТЫ КРАСАВА!"
+        with open('res.txt', "w", encoding="utf-8") as f:
+            f.write(res)
 
 
 app = QApplication(sys.argv)
